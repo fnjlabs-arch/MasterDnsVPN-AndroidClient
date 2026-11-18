@@ -1,6 +1,6 @@
 # AGENTS.md — conventions for humans and plan-executor agents
 
-This repo is the **Android client** of MasterDnsVPN. The upstream Go core lives
+This repo is the **Android client** of SadSha DNS VPN (built on the MasterDnsVPN protocol). The upstream Go core lives
 under `cmd/` and `internal/`; the bridge to Android is under `mobile/`. Plan
 executors (e.g. dispatched by the `/improve` skill) and human contributors
 should follow the conventions below.
@@ -21,7 +21,7 @@ should follow the conventions below.
 All commands run from the repository root unless noted.
 
 ```bash
-# Build the gomobile AAR (writes android/app/libs/masterdnsvpn.aar; pinned via android/gomobile.version)
+# Build the gomobile AAR (writes android/app/libs/sadshadnsvpn.aar; pinned via android/gomobile.version)
 bash ./android/build_go_mobile.sh
 
 # Build the debug APK (AAR must already exist)
@@ -67,14 +67,14 @@ the Kotlin side must add the scaffolding first (see `plans/005-kotlin-test-basel
   Exemplar: `ui/home/HomeViewModel.kt`.
 - **Room entity + DAO**: exemplar `data/local/ProfileEntity.kt` + `ProfileDao.kt`.
 - **Compose screens & UI components**:
-  - **Design tokens**: Use `MdvColor`, `MdvSpace`, and `MdvRadius` from
-    `ui/theme/MdvTokens.kt`. Never hardcode raw hex colors (e.g. `Color(0xFF...)`),
+  - **Design tokens**: Use `SdvColor`, `SdvSpace`, and `SdvRadius` from
+    `ui/theme/SdvTokens.kt`. Never hardcode raw hex colors (e.g. `Color(0xFF...)`),
     raw dimensions when tokens exist, or stock Compose colors like `Color.Gray`.
-    Declare missing semantic tokens in `MdvTokens.kt` before consuming them.
-  - **Reusable MDV primitives**: Always use standard components under
-    `ui/components/mdv/` (`MdvTopAppBar`/`MdvBackTopAppBar` for headers,
-    `MdvCardLow`/`MdvCardHigh`/`MdvSectionCard` for cards, `MdvFilterChip`,
-    `MdvPrimaryActionButton`) rather than building raw ad-hoc equivalents.
+    Declare missing semantic tokens in `SdvTokens.kt` before consuming them.
+  - **Reusable SDV primitives**: Always use standard components under
+    `ui/components/sdv/` (`SdvTopAppBar`/`SdvBackTopAppBar` for headers,
+    `SdvCardLow`/`SdvCardHigh`/`SdvSectionCard` for cards, `SdvFilterChip`,
+    `SdvPrimaryActionButton`) rather than building raw ad-hoc equivalents.
   - **Responsive layouts (No code duplication)**: When supporting wide/portrait
     modes (e.g. `metrics.isWide`), never copy-paste child widget trees across
     `if-else` branches. Extract sub-composables and keep the single source of truth;

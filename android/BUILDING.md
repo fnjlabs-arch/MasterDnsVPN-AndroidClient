@@ -24,6 +24,6 @@ If the build reports missing Go module dependencies, update the shared Go module
 
 ## AAR check
 
-`android/app/libs/masterdnsvpn.aar` is a gitignored build artifact: rebuild it after any change under `mobile/`.
+`android/app/libs/sadshadnsvpn.aar` is a gitignored build artifact: rebuild it after any change under `mobile/`.
 Every app build runs the `verifyMobileAar` Gradle task, which fails with an explicit message when the AAR is missing, unreadable, or still carries the removed legacy engine (`tun2socks` / `FakeDNS`).
 When the build reports a missing, unreadable or legacy AAR, re-run the AAR build script for your platform (see above) and rebuild.

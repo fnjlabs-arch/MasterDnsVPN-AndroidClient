@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 MOBILE_TOOLS_VERSION="$(tr -d '[:space:]' < android/gomobile.version)"
-OUTPUT_AAR="$ROOT_DIR/android/app/libs/masterdnsvpn.aar"
+OUTPUT_AAR="$ROOT_DIR/android/app/libs/sadshadnsvpn.aar"
 
 check_go_modules_clean() {
   if ! git diff --quiet -- go.mod go.sum; then
@@ -52,4 +52,4 @@ gomobile bind \
   -o "$OUTPUT_AAR" \
   ./mobile/
 
-echo "Built android/app/libs/masterdnsvpn.aar"
+echo "Built android/app/libs/sadshadnsvpn.aar"

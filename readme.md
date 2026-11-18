@@ -1,12 +1,12 @@
-# MasterDnsVPN Android Client
+# SadSha DNS VPN — Android Client
 
-[![Android CI](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml/badge.svg)](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml)
-[![Go Tests](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml/badge.svg)](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml)
+[![Android CI](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml/badge.svg)](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml)
+[![Go Tests](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml/badge.svg)](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 English | [فارسی](readme_fa.md)
 
-Android client application for the MasterDnsVPN ecosystem, built with a Kotlin/Jetpack Compose UI on top of the upstream Go networking core.
+Android client application for the SadSha DNS VPN ecosystem (built on the MasterDnsVPN protocol), with a Kotlin/Jetpack Compose UI on top of the upstream Go networking core.
 
 ## Upstream and Scope
 

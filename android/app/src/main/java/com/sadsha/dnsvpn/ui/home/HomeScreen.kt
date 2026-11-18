@@ -1,0 +1,396 @@
+package com.sadsha.dnsvpn.ui.home
+
+import android.app.Activity
+import android.net.VpnService
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import com.sadsha.dnsvpn.ui.components.sdv.cards.SdvCardLow
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.sadsha.dnsvpn.R
+import com.sadsha.dnsvpn.ui.theme.ConnectedGreen
+import com.sadsha.dnsvpn.ui.theme.ConnectingAmber
+import com.sadsha.dnsvpn.ui.theme.DisconnectedRed
+import com.sadsha.dnsvpn.ui.theme.SdvColor
+import com.sadsha.dnsvpn.ui.theme.SdvSpace
+import com.sadsha.dnsvpn.util.VpnManager
+import com.sadsha.dnsvpn.util.parseAdvancedJson
+
+private data class HomeLayoutMetrics(
+    val horizontalPadding: androidx.compose.ui.unit.Dp,
+    val verticalPadding: androidx.compose.ui.unit.Dp,
+    val isWide: Boolean
+)
+
+@Composable
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel(),
+    onNavigateToProfiles: () -> Unit,
+    onOpenInfo: () -> Unit
+) {
+    val vpnState by VpnManager.state.collectAsState()
+    val selectedProfile by viewModel.selectedProfile.collectAsState()
+    val error by VpnManager.errorMessage.collectAsState()
+    val connectionWarning by VpnManager.connectionWarning.collectAsState()
+    val context = LocalContext.current
+
+    val advanced = remember(selectedProfile?.advancedJson) {
+        parseAdvancedJson(selectedProfile?.advancedJson.orEmpty())
+    }
+    val proxyHost = advanced["LISTEN_IP"]?.trim().takeUnless { it.isNullOrEmpty() } ?: "127.0.0.1"
+    val proxyPort = selectedProfile?.listenPort ?: 18000
+    val socksAuthEnabled = advanced["SOCKS5_AUTH"].equals("true", ignoreCase = true)
+    val socksUser = advanced["SOCKS5_USER"]?.trim().orEmpty()
+    val socksPass = advanced["SOCKS5_PASS"]?.trim().orEmpty()
+
+    val vpnPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            selectedProfile?.let { profile ->
+                VpnManager.connect(context, profile)
+            }
+        }
+    }
+
+    val isConnected = vpnState == VpnManager.VpnState.CONNECTED
+    val isConnecting = vpnState == VpnManager.VpnState.CONNECTING
+    val isDisconnecting = vpnState == VpnManager.VpnState.DISCONNECTING
+
+    val statusColor by animateColorAsState(
+        targetValue = when (vpnState) {
+            VpnManager.VpnState.CONNECTED -> ConnectedGreen
+            VpnManager.VpnState.CONNECTING,
+            VpnManager.VpnState.DISCONNECTING -> ConnectingAmber
+            VpnManager.VpnState.ERROR -> DisconnectedRed
+            else -> SdvColor.Outline
+        },
+        animationSpec = tween(500),
+        label = "statusColor"
+    )
+
+    // Avoid running an infinite animation loop while idle/connected.
+    val pulseScale = if (isConnecting || isDisconnecting) {
+        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+        val animated by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.15f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(800, easing = EaseInOutCubic),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "pulseScale"
+        )
+        animated
+    } else {
+        1f
+    }
+
+    val statusText = when (vpnState) {
+        VpnManager.VpnState.CONNECTED -> stringResource(R.string.home_state_connected)
+        VpnManager.VpnState.CONNECTING -> stringResource(R.string.home_state_connecting)
+        VpnManager.VpnState.DISCONNECTING -> stringResource(R.string.home_state_disconnecting)
+        VpnManager.VpnState.ERROR -> stringResource(R.string.home_state_error)
+        else -> stringResource(R.string.home_state_disconnected)
+    }
+    var showHowToUse by rememberSaveable { mutableStateOf(false) }
+
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SdvColor.Background)
+            .statusBarsPadding()
+    ) {
+        val metrics = when {
+            maxWidth >= 840.dp -> HomeLayoutMetrics(SdvSpace.S7, SdvSpace.S6, true)
+            maxWidth >= 600.dp -> HomeLayoutMetrics(SdvSpace.S6, SdvSpace.S5, false)
+            else -> HomeLayoutMetrics(SdvSpace.S4, SdvSpace.S6, false)
+        }
+
+        val toggleVpn: () -> Unit = {
+            when (vpnState) {
+                VpnManager.VpnState.CONNECTED -> VpnManager.disconnect(context)
+                VpnManager.VpnState.CONNECTING,
+                VpnManager.VpnState.DISCONNECTING -> VpnManager.disconnect(context)
+                VpnManager.VpnState.DISCONNECTED, VpnManager.VpnState.ERROR -> {
+                    val profile = selectedProfile
+                    if (profile == null) {
+                        onNavigateToProfiles()
+                    } else {
+                        val vpnIntent = VpnService.prepare(context)
+                        if (vpnIntent != null) {
+                            vpnPermissionLauncher.launch(vpnIntent)
+                        } else {
+                            VpnManager.connect(context, profile)
+                        }
+                    }
+                }
+            }
+        }
+
+        val profileDisplayName = selectedProfile?.name ?: stringResource(R.string.home_no_profile_selected)
+        val profileSelectorName = selectedProfile?.name ?: stringResource(R.string.profiles_create)
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = metrics.horizontalPadding, vertical = metrics.verticalPadding)
+                .then(if (!metrics.isWide) Modifier.widthIn(max = 640.dp) else Modifier),
+            horizontalAlignment = if (!metrics.isWide) Alignment.CenterHorizontally else Alignment.Start
+        ) {
+            SdvHomeHeader(onOpenInfo = onOpenInfo)
+            Spacer(modifier = Modifier.height(SdvSpace.S4))
+
+            val heroSection: @Composable (Modifier) -> Unit = { modifier ->
+                HomeHeroSection(
+                    statusText = statusText,
+                    statusColor = statusColor,
+                    profileDisplayName = profileDisplayName,
+                    isConnected = isConnected,
+                    isTransitioning = isConnecting || isDisconnecting,
+                    pulseScale = pulseScale,
+                    onToggleVpn = toggleVpn,
+                    modifier = modifier
+                )
+            }
+
+            val cardsSection: @Composable (Modifier) -> Unit = { modifier ->
+                HomeCardsColumn(
+                    vpnState = vpnState,
+                    proxyHost = proxyHost,
+                    proxyPort = proxyPort,
+                    socksAuthEnabled = socksAuthEnabled,
+                    socksUser = socksUser,
+                    socksPass = socksPass,
+                    isConnecting = isConnecting,
+                    connectionWarning = connectionWarning,
+                    profileName = profileSelectorName,
+                    onNavigateToProfiles = onNavigateToProfiles,
+                    error = error,
+                    onOpenHowToUse = { showHowToUse = true },
+                    modifier = modifier
+                )
+            }
+
+            if (metrics.isWide) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    heroSection(Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(SdvSpace.S6))
+                    cardsSection(Modifier.weight(1f).widthIn(max = 560.dp))
+                }
+            } else {
+                heroSection(Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(SdvSpace.S6))
+                cardsSection(Modifier.fillMaxWidth())
+            }
+        }
+    }
+
+    if (showHowToUse) {
+        HowToUseDialog(onDismiss = { showHowToUse = false })
+    }
+}
+
+@Composable
+private fun HomeHeroSection(
+    statusText: String,
+    statusColor: Color,
+    profileDisplayName: String,
+    isConnected: Boolean,
+    isTransitioning: Boolean,
+    pulseScale: Float,
+    onToggleVpn: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        HomeStatusSummary(
+            statusText = statusText,
+            statusColor = statusColor,
+            profileName = profileDisplayName
+        )
+        Spacer(modifier = Modifier.height(SdvSpace.S6))
+        SdvConnectionNodeButton(
+            isConnected = isConnected,
+            shouldPulse = isTransitioning,
+            pulseScale = pulseScale,
+            statusColor = statusColor,
+            onToggle = onToggleVpn
+        )
+    }
+}
+
+@Composable
+private fun HomeStatusSummary(
+    statusText: String,
+    statusColor: Color,
+    profileName: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string.home_network_status),
+            style = MaterialTheme.typography.labelSmall,
+            color = SdvColor.OnSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(SdvSpace.S2))
+        Text(
+            text = statusText,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            ),
+            color = statusColor
+        )
+        Text(
+            text = profileName,
+            style = MaterialTheme.typography.bodyLarge,
+            color = SdvColor.OnSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun HomeCardsColumn(
+    vpnState: VpnManager.VpnState,
+    proxyHost: String,
+    proxyPort: Int,
+    socksAuthEnabled: Boolean,
+    socksUser: String,
+    socksPass: String,
+    isConnecting: Boolean,
+    connectionWarning: String?,
+    profileName: String,
+    onNavigateToProfiles: () -> Unit,
+    error: String?,
+    onOpenHowToUse: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        SdvConnectionTelemetryCard(
+            vpnState = vpnState,
+            proxyHost = proxyHost,
+            proxyPort = proxyPort,
+            socksAuthEnabled = socksAuthEnabled,
+            socksUser = socksUser,
+            socksPass = socksPass,
+            isConnecting = isConnecting,
+            connectionWarning = connectionWarning
+        )
+        Spacer(modifier = Modifier.height(SdvSpace.S3))
+        SdvProfileSelectorCard(
+            profileName = profileName,
+            onNavigateToProfiles = onNavigateToProfiles
+        )
+        error?.let { msg ->
+            Spacer(modifier = Modifier.height(SdvSpace.S4))
+            SdvErrorCard(msg = msg)
+        }
+        Spacer(modifier = Modifier.height(SdvSpace.S3))
+        HowToUseCard(onOpen = onOpenHowToUse)
+    }
+}
+
+@Composable
+private fun HowToUseCard(onOpen: () -> Unit) {
+    SdvCardLow(modifier = Modifier.fillMaxWidth(), onClick = onOpen) {
+        Column(modifier = Modifier.fillMaxWidth().padding(SdvSpace.S3)) {
+            Text(
+                text = stringResource(R.string.home_howto_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = SdvColor.OnSurface
+            )
+            Spacer(modifier = Modifier.height(SdvSpace.S1))
+            Text(
+                text = stringResource(R.string.home_howto_subtitle),
+                style = MaterialTheme.typography.bodySmall,
+                color = SdvColor.OnSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun HowToUseDialog(onDismiss: () -> Unit) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val maxDialogContentHeight = (screenHeight - 160.dp).coerceIn(120.dp, screenHeight * 0.72f)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = { Button(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } },
+        title = { Text(stringResource(R.string.home_howto_title)) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = maxDialogContentHeight)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(SdvSpace.S3)
+            ) {
+                val sections = stringResource(R.string.home_howto_body)
+                    .split("\n\n")
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+
+                sections.forEach { section ->
+                    Text(
+                        text = section,
+                        style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 24.sp),
+                        color = SdvColor.OnSurface,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start
+                    )
+                }
+            }
+        }
+    )
+}

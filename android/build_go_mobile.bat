@@ -1,12 +1,12 @@
 @echo off
 REM ============================================================================
-REM MasterDnsVPN - Build Go Mobile Library for Android
+REM SadSha DNS VPN - Build Go Mobile Library for Android
 REM Prerequisites: Go 1.25+, gomobile, Android NDK
 REM ============================================================================
 
 set /p MOBILE_TOOLS_VERSION=<"%~dp0gomobile.version"
 echo ===================================
-echo MasterDnsVPN - Android Build Script
+echo SadSha DNS VPN - Android Build Script
 echo ===================================
 echo.
 
@@ -89,7 +89,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-gomobile bind -v -target=android/arm64,android/arm,android/amd64,android/386 -androidapi 21 -o "%SOURCE_ROOT%\android\app\libs\masterdnsvpn.aar" ./mobile/
+gomobile bind -v -target=android/arm64,android/arm,android/amd64,android/386 -androidapi 21 -o "%SOURCE_ROOT%\android\app\libs\sadshadnsvpn.aar" ./mobile/
 
 if errorlevel 1 (
     echo.
@@ -119,7 +119,7 @@ if errorlevel 1 (
 
 echo.
 echo [2/2] Go mobile library built successfully!
-echo Output: android/app/libs/masterdnsvpn.aar
+echo Output: android/app/libs/sadshadnsvpn.aar
 echo.
 echo You can now open the android/ folder in Android Studio and build the APK.
 echo Or run: cd android ^&^& gradlew assembleDebug

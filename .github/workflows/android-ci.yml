@@ -51,11 +51,11 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: masterdns-android-debug-universal-apk
+          name: sadshadnsvpn-android-debug-universal-apk
           path: android/app/build/outputs/apk/debug/app-universal-debug.apk
 
       - name: Upload Go AAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: masterdnsvpn-aar
-          path: android/app/libs/masterdnsvpn.aar
+          name: sadshadnsvpn-aar
+          path: android/app/libs/sadshadnsvpn.aar

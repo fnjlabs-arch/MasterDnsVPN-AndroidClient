@@ -1,0 +1,59 @@
+package com.sadsha.dnsvpn.ui.theme
+
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+
+object SdvColor {
+    val Background = Color(0xFF10141A)
+    val SurfaceLowest = Color(0xFF0A0E14)
+    val SurfaceLow = Color(0xFF181C22)
+    val Surface = Color(0xFF1C2026)
+    val SurfaceHigh = Color(0xFF262A31)
+    val SurfaceHighest = Color(0xFF31353C)
+    val SurfaceBright = Color(0xFF353940)
+
+    val Primary = Color(0xFFC3F5FF)
+    val PrimaryContainer = Color(0xFF00E5FF)
+    val OnPrimary = Color(0xFF00363D)
+    val OnPrimaryContainer = Color(0xFF001F24)
+    val PrimaryDim = Color(0xFF00DAF3)
+    val Secondary = Color(0xFFBAC8DC)
+    val OnSecondary = Color(0xFF243141)
+
+    val OnSurface = Color(0xFFDFE2EB)
+    val OnSurfaceVariant = Color(0xFFBAC9CC)
+    val Outline = Color(0xFF849396)
+    val OutlineVariant = Color(0xFF3B494C)
+
+    val Error = Color(0xFFFFB4AB)
+    val ErrorContainer = Color(0xFF93000A)
+    val OnError = Color(0xFF690005)
+
+    val LogWarn = Color(0xFFFFB74D)
+    val LogWarnContainer = Color(0xFF5A4321)
+    val LogInfo = Color(0xFF81C784)
+    val LogInfoContainer = Color(0xFF1C3B25)
+
+    val QrBackground = Color(0xFFFFFFFF)
+    val OverlayScrim = Color(0x99000000)
+    val CameraBackdrop = Color(0xFF000000)
+    val OnCameraBackdrop = Color(0xFFFFFFFF)
+}
+
+object SdvSpace {
+    val S1 = 4.dp
+    val S2 = 8.dp
+    val S3 = 12.dp
+    val S4 = 16.dp
+    val S5 = 20.dp
+    val S6 = 24.dp
+    val S7 = 32.dp
+}
+
+object SdvRadius {
+    val Sm = 8.dp
+    val Md = 12.dp
+    val Lg = 16.dp
+    val Xl = 20.dp
+}
+

@@ -1,12 +1,12 @@
-# کلاینت اندروید MasterDnsVPN
+# کلاینت اندروید SadSha DNS VPN
 
-[![Android CI](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml/badge.svg)](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml)
-[![Go Tests](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml/badge.svg)](https://github.com/Hidden-Node/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml)
+[![Android CI](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml/badge.svg)](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/android-ci.yml)
+[![Go Tests](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml/badge.svg)](https://github.com/fnjlabs-arch/MasterDnsVPN-AndroidClient/actions/workflows/go-test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 [English](readme.md) | فارسی
 
-این ریپوزیتوری کلاینت اندرویدی MasterDnsVPN است که رابط کاربری آن با Kotlin/Jetpack Compose توسعه داده شده و از هسته شبکه Go پروژه اصلی استفاده می کند.
+این ریپوزیتوری کلاینت اندرویدی SadSha DNS VPN است که رابط کاربری آن با Kotlin/Jetpack Compose توسعه داده شده و از هسته شبکه Go پروژه اصلی استفاده می کند.
 
 ## محدوده پروژه و ریپوی بالادستی
 

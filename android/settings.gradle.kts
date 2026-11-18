@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MasterDnsVPN"
+rootProject.name = "SadShaDnsVpn"
 include(":app")

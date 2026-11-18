@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "com.masterdns.vpn"
+    namespace = "com.sadsha.dnsvpn"
     compileSdk = 36
     val appVersionName = System.getenv("ANDROID_VERSION_NAME")
         ?.takeIf { it.isNotBlank() }
@@ -22,7 +22,7 @@ android {
         ?: 1
 
     defaultConfig {
-        applicationId = "com.masterdns.vpn"
+        applicationId = "com.sadsha.dnsvpn"
         minSdk = 21
         targetSdk = 36
         versionCode = appVersionCode
@@ -127,7 +127,7 @@ val verifyMobileAar = tasks.register("verifyMobileAar") {
     group = "verification"
     description = "Fails when the gomobile AAR is missing or still carries the removed legacy engine."
     outputs.upToDateWhen { false }
-    val aarFile = layout.projectDirectory.file("libs/masterdnsvpn.aar").asFile
+    val aarFile = layout.projectDirectory.file("libs/sadshadnsvpn.aar").asFile
     doLast {
         if (!aarFile.isFile) {
             throw org.gradle.api.GradleException(

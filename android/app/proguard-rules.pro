@@ -1,4 +1,4 @@
-# ProGuard rules for MasterDnsVPN Android
+# ProGuard rules for SadSha DNS VPN Android
 
 # Keep Go mobile bindings
 -keep class mobile.** { *; }
@@ -8,4 +8,4 @@
 -keep class dagger.hilt.** { *; }
 
 # Keep Room entities
--keep class com.masterdns.vpn.data.local.** { *; }
+-keep class com.sadsha.dnsvpn.data.local.** { *; }
